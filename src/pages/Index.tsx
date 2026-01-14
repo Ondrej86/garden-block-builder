@@ -6,6 +6,7 @@ import AssemblySection from "@/components/AssemblySection";
 import ConfiguratorCTA from "@/components/ConfiguratorCTA";
 import Testimonials from "@/components/Testimonials";
 import CompanyStory from "@/components/CompanyStory";
+import AffiliateSection from "@/components/AffiliateSection";
 import FinalCTA from "@/components/FinalCTA";
 import Footer from "@/components/Footer";
 import FloatingCTA from "@/components/FloatingCTA";
@@ -27,6 +28,9 @@ const Index = () => {
         <Testimonials />
         <section id="about">
           <CompanyStory />
+        </section>
+        <section id="partners">
+          <AffiliateSection />
         </section>
         <FinalCTA />
       </main>
