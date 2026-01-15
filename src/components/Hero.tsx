@@ -1,7 +1,45 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useEffect, useState, useRef } from "react";
 import heroImage from "@/assets/hero-garden.jpg";
+
+// Animated counter component for hero stats (faster animation)
+const HeroAnimatedCounter = ({ end, suffix = "", duration = 1.5 }: { end: number; suffix?: string; duration?: number }) => {
+  const [count, setCount] = useState(0);
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const ref = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAnimated) {
+          setHasAnimated(true);
+          let startTime: number;
+          const animate = (currentTime: number) => {
+            if (!startTime) startTime = currentTime;
+            const progress = Math.min((currentTime - startTime) / (duration * 1000), 1);
+            const easeOut = 1 - Math.pow(1 - progress, 3);
+            setCount(Math.floor(easeOut * end));
+            if (progress < 1) {
+              requestAnimationFrame(animate);
+            }
+          };
+          requestAnimationFrame(animate);
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => observer.disconnect();
+  }, [end, duration, hasAnimated]);
+
+  return <span ref={ref}>{count}{suffix}</span>;
+};
 
 const Hero = () => {
   return (
@@ -18,25 +56,7 @@ const Hero = () => {
 
       {/* Content */}
       <div className="container-grid relative z-10 py-20">
-        <div className="max-w-3xl">
-          {/* Trust Badges */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="flex flex-wrap gap-3 mb-8"
-          >
-            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-primary-foreground/15 text-primary-foreground backdrop-blur-sm">
-              🇸🇰 Made in Slovakia
-            </span>
-            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-primary-foreground/15 text-primary-foreground backdrop-blur-sm">
-              🛡️ 25+ Year Lifespan
-            </span>
-            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-primary-foreground/15 text-primary-foreground backdrop-blur-sm">
-              🔧 No Tools Required
-            </span>
-          </motion.div>
-
+        <div className="max-w-4xl mx-auto text-center">
           {/* Product Line Label */}
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -64,9 +84,9 @@ const Hero = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="text-xl text-primary-foreground/85 mb-10 max-w-xl leading-relaxed"
+            className="text-xl text-primary-foreground/85 mb-10 max-w-xl mx-auto leading-relaxed"
           >
-            Premium modular garden beds built to last 25+ years. 
+            Premium modular garden beds built to last 25+ years.
             Use our 3D configurator to design your perfect raised bed and get instant pricing.
           </motion.p>
 
@@ -75,7 +95,7 @@ const Hero = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="flex flex-col sm:flex-row gap-4"
+            className="flex flex-col sm:flex-row gap-4 justify-center"
           >
             <Button variant="hero" size="xl" className="group">
               Launch Configurator
@@ -87,24 +107,36 @@ const Hero = () => {
             </Button>
           </motion.div>
 
-          {/* Stats Row */}
+          {/* Stats Row - Larger with fast animation */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.5 }}
-            className="mt-16 flex flex-wrap gap-10"
+            className="mt-16 flex flex-wrap gap-12 sm:gap-16 justify-center"
           >
-            <div>
-              <p className="text-4xl font-bold text-primary-foreground">500+</p>
-              <p className="text-sm text-primary-foreground/70">Happy Customers</p>
+            <div className="text-center">
+              <p className="text-5xl sm:text-6xl font-bold text-primary-foreground">
+                <HeroAnimatedCounter end={500} suffix="+" duration={1.2} />
+              </p>
+              <p className="text-base text-primary-foreground/70 mt-1">Happy Customers</p>
             </div>
-            <div>
-              <p className="text-4xl font-bold text-primary-foreground">60mm</p>
-              <p className="text-sm text-primary-foreground/70">Solid Wood</p>
+            <div className="text-center">
+              <p className="text-5xl sm:text-6xl font-bold text-primary-foreground">
+                <HeroAnimatedCounter end={60} suffix="mm" duration={1.2} />
+              </p>
+              <p className="text-base text-primary-foreground/70 mt-1">Solid Wood</p>
             </div>
-            <div>
-              <p className="text-4xl font-bold text-primary-foreground">0</p>
-              <p className="text-sm text-primary-foreground/70">Screws Needed</p>
+            <div className="text-center">
+              <p className="text-5xl sm:text-6xl font-bold text-primary-foreground">
+                <HeroAnimatedCounter end={25} suffix="+" duration={1.2} />
+              </p>
+              <p className="text-base text-primary-foreground/70 mt-1">Year Lifespan</p>
+            </div>
+            <div className="text-center">
+              <p className="text-5xl sm:text-6xl font-bold text-primary-foreground">
+                <HeroAnimatedCounter end={0} duration={0.5} />
+              </p>
+              <p className="text-base text-primary-foreground/70 mt-1">Screws Needed</p>
             </div>
           </motion.div>
         </div>
